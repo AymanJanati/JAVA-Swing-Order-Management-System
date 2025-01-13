@@ -6,12 +6,8 @@ import com.gestion.commandes.models.Client;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.util.List;
-import com.gestion.commandes.models.Client;
-
 
 public class ClientPanel extends JPanel {
     private JTable clientTable;
@@ -20,14 +16,32 @@ public class ClientPanel extends JPanel {
 
     public ClientPanel() {
         setLayout(new BorderLayout());
+        setBackground(new Color(245, 246, 250)); // Background color: #F5F6FA
 
         // Initialize the DAO
         clientDAO = new ClientDAO();
 
         // Create a table model with columns: ID, Nom, Email, Téléphone
-        tableModel = new DefaultTableModel(new String[]{"ID", "Nom", "Email", "Téléphone"}, 0);
+        tableModel = new DefaultTableModel(new String[]{"ID", "Nom", "Email", "Téléphone"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Make the table non-editable
+            }
+        };
         clientTable = new JTable(tableModel);
+        clientTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // Allow only single row selection
+        clientTable.setFont(new Font("Roboto", Font.PLAIN, 14)); // Set font
+        clientTable.setRowHeight(30); // Increase row height for better readability
+        clientTable.getTableHeader().setFont(new Font("Roboto", Font.BOLD, 14)); // Set header font
+
+        // Style the table
+        clientTable.setBackground(Color.WHITE);
+        clientTable.setForeground(new Color(51, 51, 51)); // Text color: #333333
+        clientTable.getTableHeader().setBackground(new Color(21, 34, 56)); // Main color: #152238
+        clientTable.getTableHeader().setForeground(Color.WHITE); // Header text color: White
+
         JScrollPane scrollPane = new JScrollPane(clientTable);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder()); // Remove border
         add(scrollPane, BorderLayout.CENTER);
 
         // Load clients from the database
@@ -35,9 +49,12 @@ public class ClientPanel extends JPanel {
 
         // Create buttons for CRUD operations
         JPanel buttonPanel = new JPanel();
-        JButton addButton = new JButton("Ajouter");
-        JButton editButton = new JButton("Modifier");
-        JButton deleteButton = new JButton("Supprimer");
+        buttonPanel.setBackground(new Color(245, 246, 250)); // Background color: #F5F6FA
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0)); // Add padding
+
+        JButton addButton = createButton("Ajouter", new Color(52, 21, 57)); // Accent color: #341539
+        JButton editButton = createButton("Modifier", new Color(44, 62, 80)); // Secondary color: #2C3E50
+        JButton deleteButton = createButton("Supprimer", new Color(231, 76, 60)); // Highlight color: #E74C3C
 
         // Add action listeners
         addButton.addActionListener(e -> {
@@ -45,7 +62,6 @@ public class ClientPanel extends JPanel {
             dialog.setVisible(true);
         });
 
-        // Update the ActionListener for the "Modifier" button
         editButton.addActionListener(e -> {
             int selectedRow = clientTable.getSelectedRow();
             if (selectedRow == -1) {
@@ -67,7 +83,6 @@ public class ClientPanel extends JPanel {
             dialog.setVisible(true);
         });
 
-        // Update the ActionListener for the "Supprimer" button
         deleteButton.addActionListener(e -> {
             int selectedRow = clientTable.getSelectedRow();
             if (selectedRow == -1) {
@@ -82,7 +97,6 @@ public class ClientPanel extends JPanel {
             int confirm = JOptionPane.showConfirmDialog(this, "Êtes-vous sûr de vouloir supprimer ce client?", "Confirmation", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
                 try {
-                    ClientDAO clientDAO = new ClientDAO();
                     clientDAO.deleteClient(idClient);
                     JOptionPane.showMessageDialog(this, "Client supprimé avec succès!", "Succès", JOptionPane.INFORMATION_MESSAGE);
                     loadClients(); // Refresh the client list
@@ -93,12 +107,23 @@ public class ClientPanel extends JPanel {
             }
         });
 
-
+        // Add buttons to the panel
         buttonPanel.add(addButton);
         buttonPanel.add(editButton);
         buttonPanel.add(deleteButton);
 
         add(buttonPanel, BorderLayout.SOUTH);
+    }
+
+    private JButton createButton(String text, Color color) {
+        JButton button = new JButton(text);
+        button.setBackground(color);
+        button.setForeground(Color.WHITE); // Text color: White
+        button.setFont(new Font("Roboto", Font.BOLD, 14));
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+        button.setPreferredSize(new Dimension(120, 40));
+        return button;
     }
 
     public void loadClients() {

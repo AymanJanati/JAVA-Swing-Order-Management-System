@@ -17,6 +17,7 @@ public class AddFactureDialog extends JDialog {
     private JTextField dateField;
     private JTextField montantTotalField;
     private JTextField idClientField;
+    private JTextField discountField; // New field for discount input
     private JButton saveButton;
     private FacturePanel facturePanel;
     private JTable ligneTable;
@@ -33,6 +34,7 @@ public class AddFactureDialog extends JDialog {
         dateField = new JTextField(20);
         montantTotalField = new JTextField(20);
         idClientField = new JTextField(20);
+        discountField = new JTextField(20); // New field for discount
 
         // Create a table for invoice lines
         ligneTableModel = new DefaultTableModel(new String[]{"ID Produit", "Quantité", "Sous-Total"}, 0);
@@ -50,13 +52,15 @@ public class AddFactureDialog extends JDialog {
         // Add components to the dialog
         JPanel panel = new JPanel(new BorderLayout());
 
-        JPanel formPanel = new JPanel(new GridLayout(3, 2));
+        JPanel formPanel = new JPanel(new GridLayout(4, 2)); // Updated to 4 rows for the discount field
         formPanel.add(new JLabel("Date (YYYY-MM-DD):"));
         formPanel.add(dateField);
         formPanel.add(new JLabel("Montant Total:"));
         formPanel.add(montantTotalField);
         formPanel.add(new JLabel("ID Client:"));
         formPanel.add(idClientField);
+        formPanel.add(new JLabel("Remise (%):")); // New label for discount
+        formPanel.add(discountField); // New field for discount
 
         panel.add(formPanel, BorderLayout.NORTH);
         panel.add(ligneScrollPane, BorderLayout.CENTER);
@@ -104,6 +108,7 @@ public class AddFactureDialog extends JDialog {
         String date = dateField.getText();
         double montantTotal;
         int idClient;
+        double discount;
 
         // Validate date format (YYYY-MM-DD)
         if (!date.matches("\\d{4}-\\d{2}-\\d{2}")) {
@@ -114,8 +119,9 @@ public class AddFactureDialog extends JDialog {
         try {
             montantTotal = Double.parseDouble(montantTotalField.getText());
             idClient = Integer.parseInt(idClientField.getText());
+            discount = Double.parseDouble(discountField.getText()) / 100.0; // Convert percentage to decimal
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Veuillez entrer un montant total et un ID client valides.", "Erreur", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Veuillez entrer un montant total, un ID client et une remise valides.", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -124,8 +130,8 @@ public class AddFactureDialog extends JDialog {
             return;
         }
 
-        // Create a new Facture object
-        Facture facture = new Facture(0, date, montantTotal, idClient, new ArrayList<>());
+        // Create a new Facture object with the discount
+        Facture facture = new Facture(0, date, montantTotal, idClient, new ArrayList<>(), discount);
 
         // Add invoice lines from the table
         for (int i = 0; i < ligneTableModel.getRowCount(); i++) {

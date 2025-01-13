@@ -4,6 +4,7 @@ import com.gestion.commandes.database.CommandeDAO;
 import com.gestion.commandes.models.Commande;
 import com.gestion.commandes.models.LigneCommande;
 import com.gestion.commandes.utils.PDFExporter;
+import com.gestion.commandes.utils.CSVExporter; // Import the CSVExporter
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -36,7 +37,8 @@ public class CommandePanel extends JPanel {
         JButton addButton = new JButton("Ajouter");
         JButton editButton = new JButton("Modifier");
         JButton deleteButton = new JButton("Supprimer");
-        JButton exportButton = new JButton("Exporter en PDF");
+        JButton exportPDFButton = new JButton("Exporter en PDF");
+        JButton exportCSVButton = new JButton("Exporter en CSV"); // New CSV export button
 
         // Add action listeners
         addButton.addActionListener(e -> {
@@ -95,13 +97,17 @@ public class CommandePanel extends JPanel {
         });
 
         // Add PDF export functionality
-        exportButton.addActionListener(e -> exportToPDF());
+        exportPDFButton.addActionListener(e -> exportToPDF());
+
+        // Add CSV export functionality
+        exportCSVButton.addActionListener(e -> exportToCSV());
 
         // Add buttons to the panel
         buttonPanel.add(addButton);
         buttonPanel.add(editButton);
         buttonPanel.add(deleteButton);
-        buttonPanel.add(exportButton);
+        buttonPanel.add(exportPDFButton);
+        buttonPanel.add(exportCSVButton); // Add the CSV export button
 
         add(buttonPanel, BorderLayout.SOUTH);
     }
@@ -140,6 +146,19 @@ public class CommandePanel extends JPanel {
             }
             PDFExporter.exportToPDF(filePath, content.toString());
             JOptionPane.showMessageDialog(this, "Exportation réussie!", "Succès", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
+    private void exportToCSV() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Enregistrer le fichier CSV");
+        if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            String filePath = fileChooser.getSelectedFile().getAbsolutePath();
+            if (!filePath.endsWith(".csv")) {
+                filePath += ".csv";
+            }
+            CSVExporter.exportToCSV(commandeTable, filePath);
+            JOptionPane.showMessageDialog(this, "Exportation CSV réussie!", "Succès", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 }

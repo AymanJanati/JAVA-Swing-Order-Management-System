@@ -8,14 +8,16 @@ public class Facture {
     private double montantTotal;
     private int idClient;
     private List<LigneFacture> lignesFacture;
+    private double discount; // New field for discount
 
-    // Constructor
-    public Facture(int idFacture, String date, double montantTotal, int idClient, List<LigneFacture> lignesFacture) {
+    // Updated Constructor
+    public Facture(int idFacture, String date, double montantTotal, int idClient, List<LigneFacture> lignesFacture, double discount) {
         this.idFacture = idFacture;
         this.date = date;
         this.montantTotal = montantTotal;
         this.idClient = idClient;
         this.lignesFacture = lignesFacture;
+        this.discount = discount; // Initialize discount
     }
 
     // Getters and Setters
@@ -57,5 +59,14 @@ public class Facture {
 
     public void setLignesFacture(List<LigneFacture> lignesFacture) {
         this.lignesFacture = lignesFacture;
+    }
+
+    // New getter and setter for discount
+    public double getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(double discount) {
+        this.discount = discount;
     }
 }

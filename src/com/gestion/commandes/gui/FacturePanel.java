@@ -15,6 +15,7 @@ public class FacturePanel extends JPanel {
     private JTable factureTable;
     private DefaultTableModel tableModel;
     private FactureDAO factureDAO;
+    private JTextField discountField; // New field for discount input
 
     public FacturePanel() {
         setLayout(new BorderLayout());
@@ -22,8 +23,8 @@ public class FacturePanel extends JPanel {
         // Initialize the DAO
         factureDAO = new FactureDAO();
 
-        // Create a table model with columns: ID, Date, Montant Total, ID Client
-        tableModel = new DefaultTableModel(new String[]{"ID", "Date", "Montant Total", "ID Client"}, 0);
+        // Create a table model with columns: ID, Date, Montant Total, ID Client, Discount
+        tableModel = new DefaultTableModel(new String[]{"ID", "Date", "Montant Total", "ID Client", "Remise (%)"}, 0);
         factureTable = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(factureTable);
         add(scrollPane, BorderLayout.CENTER);
@@ -37,6 +38,11 @@ public class FacturePanel extends JPanel {
         JButton editButton = new JButton("Modifier");
         JButton deleteButton = new JButton("Supprimer");
         JButton exportButton = new JButton("Exporter en PDF");
+
+        // Add discount input field
+        discountField = new JTextField(10); // For entering discount percentage
+        buttonPanel.add(new JLabel("Remise (%):"));
+        buttonPanel.add(discountField);
 
         // Add action listeners
         addButton.addActionListener(e -> {
@@ -56,11 +62,12 @@ public class FacturePanel extends JPanel {
             String date = (String) factureTable.getValueAt(selectedRow, 1);
             double montantTotal = (double) factureTable.getValueAt(selectedRow, 2);
             int idClient = (int) factureTable.getValueAt(selectedRow, 3);
+            double discount = (double) factureTable.getValueAt(selectedRow, 4); // Get discount from the table
 
             // Fetch the invoice lines from the database
             try {
                 List<LigneFacture> lignes = factureDAO.getLignesFacture(idFacture);
-                Facture facture = new Facture(idFacture, date, montantTotal, idClient, lignes);
+                Facture facture = new Facture(idFacture, date, montantTotal, idClient, lignes, discount); // Include discount
 
                 // Open the EditFactureDialog
                 EditFactureDialog dialog = new EditFactureDialog((JFrame) SwingUtilities.getWindowAncestor(this), this, facture);
@@ -116,7 +123,8 @@ public class FacturePanel extends JPanel {
                         facture.getIdFacture(),
                         facture.getDate(),
                         facture.getMontantTotal(),
-                        facture.getIdClient()
+                        facture.getIdClient(),
+                        facture.getDiscount() // Add discount to the table
                 });
             }
         } catch (SQLException e) {
@@ -131,7 +139,8 @@ public class FacturePanel extends JPanel {
             content.append("ID: ").append(tableModel.getValueAt(i, 0)).append("\n");
             content.append("Date: ").append(tableModel.getValueAt(i, 1)).append("\n");
             content.append("Montant Total: ").append(tableModel.getValueAt(i, 2)).append("\n");
-            content.append("ID Client: ").append(tableModel.getValueAt(i, 3)).append("\n\n");
+            content.append("ID Client: ").append(tableModel.getValueAt(i, 3)).append("\n");
+            content.append("Remise (%): ").append(tableModel.getValueAt(i, 4)).append("\n\n"); // Add discount to the PDF
         }
 
         JFileChooser fileChooser = new JFileChooser();
