@@ -7,7 +7,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.SQLException;
-import java.util.List; // Correct import
+import java.util.List;
 
 public class ProduitPanel extends JPanel {
     private JTable produitTable;
@@ -16,14 +16,33 @@ public class ProduitPanel extends JPanel {
 
     public ProduitPanel() {
         setLayout(new BorderLayout());
+        setBackground(new Color(18, 18, 18)); // Updated to dark theme background: #121212
 
         // Initialize the DAO
         produitDAO = new ProduitDAO();
 
-        // Initialize the table model
-        tableModel = new DefaultTableModel(new String[]{"ID", "Nom", "Prix", "Quantité en Stock"}, 0);
+        // Create a table model with columns: ID, Nom, Prix, Quantité en Stock
+        tableModel = new DefaultTableModel(new String[]{"ID", "Nom", "Prix", "Quantité en Stock"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Make the table non-editable
+            }
+        };
         produitTable = new JTable(tableModel);
+        produitTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // Allow only single row selection
+        produitTable.setFont(new Font("Segoe UI", Font.PLAIN, 14)); // Set font
+        produitTable.setRowHeight(30); // Increase row height for better readability
+        produitTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14)); // Set header font
+
+        // Style the table for dark theme
+        produitTable.setBackground(new Color(37, 37, 38)); // Table background: #252526
+        produitTable.setForeground(Color.WHITE); // Text color: White
+        produitTable.getTableHeader().setBackground(new Color(52, 21, 57)); // Header background: #341539
+        produitTable.getTableHeader().setForeground(Color.WHITE); // Header text color: White
+        produitTable.setGridColor(new Color(58, 58, 58)); // Grid color: #3A3A3A
+
         JScrollPane scrollPane = new JScrollPane(produitTable);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder()); // Remove border
         add(scrollPane, BorderLayout.CENTER);
 
         // Load products from the database
@@ -31,9 +50,12 @@ public class ProduitPanel extends JPanel {
 
         // Create buttons for CRUD operations
         JPanel buttonPanel = new JPanel();
-        JButton addButton = new JButton("Ajouter");
-        JButton editButton = new JButton("Modifier");
-        JButton deleteButton = new JButton("Supprimer");
+        buttonPanel.setBackground(new Color(18, 18, 18)); // Updated to dark theme background: #121212
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0)); // Add padding
+
+        JButton addButton = createButton("Ajouter", new Color(52, 21, 57)); // Accent color: #341539
+        JButton editButton = createButton("Modifier", new Color(44, 62, 80)); // Secondary color: #2C3E50
+        JButton deleteButton = createButton("Supprimer", new Color(231, 76, 60)); // Highlight color: #E74C3C
 
         // Add action listeners
         addButton.addActionListener(e -> {
@@ -86,6 +108,7 @@ public class ProduitPanel extends JPanel {
             }
         });
 
+        // Add buttons to the panel
         buttonPanel.add(addButton);
         buttonPanel.add(editButton);
         buttonPanel.add(deleteButton);
@@ -93,11 +116,34 @@ public class ProduitPanel extends JPanel {
         add(buttonPanel, BorderLayout.SOUTH);
     }
 
+    private JButton createButton(String text, Color color) {
+        JButton button = new JButton(text);
+        button.setBackground(color);
+        button.setForeground(Color.WHITE); // Text color: White
+        button.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+        button.setPreferredSize(new Dimension(120, 40));
+
+        // Add hover effect
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(color.brighter()); // Slightly lighter on hover
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(color); // Restore original color
+            }
+        });
+
+        return button;
+    }
+
     public void loadProduits() {
         try {
-            List<Produit> produits = produitDAO.getAllProduits(); // Use java.util.List
+            List<Produit> produits = produitDAO.getAllProduits();
             tableModel.setRowCount(0); // Clear the table
-            for (Produit produit : produits) { // Use foreach loop
+            for (Produit produit : produits) {
                 tableModel.addRow(new Object[]{
                         produit.getIdProduit(),
                         produit.getNom(),

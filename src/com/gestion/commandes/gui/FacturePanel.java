@@ -19,14 +19,33 @@ public class FacturePanel extends JPanel {
 
     public FacturePanel() {
         setLayout(new BorderLayout());
+        setBackground(new Color(18, 18, 18)); // Updated to dark theme background: #121212
 
         // Initialize the DAO
         factureDAO = new FactureDAO();
 
         // Create a table model with columns: ID, Date, Montant Total, ID Client, Discount
-        tableModel = new DefaultTableModel(new String[]{"ID", "Date", "Montant Total", "ID Client", "Remise (%)"}, 0);
+        tableModel = new DefaultTableModel(new String[]{"ID", "Date", "Montant Total", "ID Client", "Remise (%)"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Make the table non-editable
+            }
+        };
         factureTable = new JTable(tableModel);
+        factureTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // Allow only single row selection
+        factureTable.setFont(new Font("Segoe UI", Font.PLAIN, 14)); // Set font
+        factureTable.setRowHeight(30); // Increase row height for better readability
+        factureTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14)); // Set header font
+
+        // Style the table for dark theme
+        factureTable.setBackground(new Color(37, 37, 38)); // Table background: #252526
+        factureTable.setForeground(Color.WHITE); // Text color: White
+        factureTable.getTableHeader().setBackground(new Color(52, 21, 57)); // Header background: #341539
+        factureTable.getTableHeader().setForeground(Color.WHITE); // Header text color: White
+        factureTable.setGridColor(new Color(58, 58, 58)); // Grid color: #3A3A3A
+
         JScrollPane scrollPane = new JScrollPane(factureTable);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder()); // Remove border
         add(scrollPane, BorderLayout.CENTER);
 
         // Load invoices from the database
@@ -34,13 +53,21 @@ public class FacturePanel extends JPanel {
 
         // Create buttons for CRUD operations
         JPanel buttonPanel = new JPanel();
-        JButton addButton = new JButton("Ajouter");
-        JButton editButton = new JButton("Modifier");
-        JButton deleteButton = new JButton("Supprimer");
-        JButton exportButton = new JButton("Exporter en PDF");
+        buttonPanel.setBackground(new Color(18, 18, 18)); // Updated to dark theme background: #121212
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0)); // Add padding
+
+        JButton addButton = createButton("Ajouter", new Color(52, 21, 57)); // Accent color: #341539
+        JButton editButton = createButton("Modifier", new Color(44, 62, 80)); // Secondary color: #2C3E50
+        JButton deleteButton = createButton("Supprimer", new Color(231, 76, 60)); // Highlight color: #E74C3C
+        JButton exportButton = createButton("Exporter en PDF", new Color(52, 152, 219)); // Export button color: #3498DB
 
         // Add discount input field
         discountField = new JTextField(10); // For entering discount percentage
+        discountField.setBackground(new Color(37, 37, 38)); // Input field background: #252526
+        discountField.setForeground(Color.WHITE); // Input field text color: White
+        discountField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        discountField.setBorder(BorderFactory.createLineBorder(new Color(58, 58, 58))); // Border color: #3A3A3A
+
         buttonPanel.add(new JLabel("Remise (%):"));
         buttonPanel.add(discountField);
 
@@ -112,6 +139,29 @@ public class FacturePanel extends JPanel {
         buttonPanel.add(exportButton);
 
         add(buttonPanel, BorderLayout.SOUTH);
+    }
+
+    private JButton createButton(String text, Color color) {
+        JButton button = new JButton(text);
+        button.setBackground(color);
+        button.setForeground(Color.WHITE); // Text color: White
+        button.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+        button.setPreferredSize(new Dimension(150, 40));
+
+        // Add hover effect
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(color.brighter()); // Slightly lighter on hover
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(color); // Restore original color
+            }
+        });
+
+        return button;
     }
 
     public void loadFactures() {

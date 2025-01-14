@@ -16,7 +16,7 @@ public class ClientPanel extends JPanel {
 
     public ClientPanel() {
         setLayout(new BorderLayout());
-        setBackground(new Color(245, 246, 250)); // Background color: #F5F6FA
+        setBackground(new Color(18, 18, 18)); // Updated to dark theme background: #121212
 
         // Initialize the DAO
         clientDAO = new ClientDAO();
@@ -30,15 +30,16 @@ public class ClientPanel extends JPanel {
         };
         clientTable = new JTable(tableModel);
         clientTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // Allow only single row selection
-        clientTable.setFont(new Font("Roboto", Font.PLAIN, 14)); // Set font
+        clientTable.setFont(new Font("Segoe UI", Font.PLAIN, 14)); // Set font
         clientTable.setRowHeight(30); // Increase row height for better readability
-        clientTable.getTableHeader().setFont(new Font("Roboto", Font.BOLD, 14)); // Set header font
+        clientTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14)); // Set header font
 
-        // Style the table
-        clientTable.setBackground(Color.WHITE);
-        clientTable.setForeground(new Color(51, 51, 51)); // Text color: #333333
-        clientTable.getTableHeader().setBackground(new Color(21, 34, 56)); // Main color: #152238
+        // Style the table for dark theme
+        clientTable.setBackground(new Color(37, 37, 38)); // Table background: #252526
+        clientTable.setForeground(Color.WHITE); // Text color: White
+        clientTable.getTableHeader().setBackground(new Color(52, 21, 57)); // Header background: #341539
         clientTable.getTableHeader().setForeground(Color.WHITE); // Header text color: White
+        clientTable.setGridColor(new Color(58, 58, 58)); // Grid color: #3A3A3A
 
         JScrollPane scrollPane = new JScrollPane(clientTable);
         scrollPane.setBorder(BorderFactory.createEmptyBorder()); // Remove border
@@ -49,7 +50,7 @@ public class ClientPanel extends JPanel {
 
         // Create buttons for CRUD operations
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setBackground(new Color(245, 246, 250)); // Background color: #F5F6FA
+        buttonPanel.setBackground(new Color(18, 18, 18)); // Updated to dark theme background: #121212
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0)); // Add padding
 
         JButton addButton = createButton("Ajouter", new Color(52, 21, 57)); // Accent color: #341539
@@ -119,10 +120,22 @@ public class ClientPanel extends JPanel {
         JButton button = new JButton(text);
         button.setBackground(color);
         button.setForeground(Color.WHITE); // Text color: White
-        button.setFont(new Font("Roboto", Font.BOLD, 14));
+        button.setFont(new Font("Segoe UI", Font.BOLD, 14));
         button.setFocusPainted(false);
         button.setBorderPainted(false);
         button.setPreferredSize(new Dimension(120, 40));
+
+        // Add hover effect
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(color.brighter()); // Slightly lighter on hover
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(color); // Restore original color
+            }
+        });
+
         return button;
     }
 
