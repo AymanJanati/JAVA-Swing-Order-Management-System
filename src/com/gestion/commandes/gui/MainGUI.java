@@ -1,6 +1,7 @@
 package com.gestion.commandes.gui;
 
 import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLightLaf;
 import org.kordamp.ikonli.fontawesome.FontAwesome;
 import org.kordamp.ikonli.swing.FontIcon;
 
@@ -13,12 +14,29 @@ public class MainGUI extends JFrame {
     private JPanel contentPanel; // Make contentPanel a class variable
     private JPanel sidebar; // Make sidebar a class variable
     private boolean isSidebarVisible = true; // Track sidebar visibility
+    private boolean isDarkMode = true; // Track dark mode state
 
-    public MainGUI() {
-        // Set the FlatLaf dark theme
+    // Panels
+    private ClientPanel clientPanel;
+    private ProduitPanel produitPanel;
+    private FacturePanel facturePanel;
+    private CommandePanel commandePanel;
+
+    // Private constructor to enforce login before accessing MainGUI
+    MainGUI() {
+        initializeUI();
+    }
+
+    // Static method to create an instance of MainGUI after successful login
+    public static void showMainGUI() {
+        SwingUtilities.invokeLater(() -> new MainGUI().setVisible(true));
+    }
+
+    private void initializeUI() {
+        // Set the FlatLaf dark theme by default
         FlatDarkLaf.setup();
 
-        setTitle("Gestion des Commandes et des Factures");
+        setTitle("AstraOrders - Gestion des Commandes et des Factures"); // Updated title
         setSize(1200, 800); // Increased size for better layout
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -34,7 +52,7 @@ public class MainGUI extends JFrame {
 
         // Create the main panel with a BorderLayout
         JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(new Color(18, 18, 18)); // Main background: #121212
+        mainPanel.setBackground(UIManager.getColor("Panel.background")); // Theme-aware color
 
         // Create the sidebar with a slightly lighter color (#1E1E1E)
         sidebar = createSidebar();
@@ -42,20 +60,26 @@ public class MainGUI extends JFrame {
 
         // Create the content panel (will display Clients, Produits, Factures, Commandes)
         contentPanel = new JPanel(new CardLayout()); // Initialize contentPanel
-        contentPanel.setBackground(new Color(18, 18, 18)); // Background color: #121212
+        contentPanel.setBackground(UIManager.getColor("Panel.background")); // Theme-aware color
+
+        // Initialize panels
+        clientPanel = new ClientPanel();
+        produitPanel = new ProduitPanel();
+        facturePanel = new FacturePanel();
+        commandePanel = new CommandePanel();
 
         // Add panels to the content panel
-        contentPanel.add(new ClientPanel(), "Clients");
-        contentPanel.add(new ProduitPanel(), "Produits");
-        contentPanel.add(new FacturePanel(), "Factures");
-        contentPanel.add(new CommandePanel(), "Commandes");
+        contentPanel.add(clientPanel, "Clients");
+        contentPanel.add(produitPanel, "Produits");
+        contentPanel.add(facturePanel, "Factures");
+        contentPanel.add(commandePanel, "Commandes");
 
         mainPanel.add(contentPanel, BorderLayout.CENTER);
 
         // Add a toggle button to hide/show the sidebar (placed in the north region)
         JButton toggleSidebarButton = new JButton("☰");
-        toggleSidebarButton.setBackground(new Color(37, 37, 38)); // Button background: #252526
-        toggleSidebarButton.setForeground(Color.WHITE); // Text color: White
+        toggleSidebarButton.setBackground(UIManager.getColor("Button.background")); // Theme-aware color
+        toggleSidebarButton.setForeground(UIManager.getColor("Button.foreground")); // Theme-aware color
         toggleSidebarButton.setFocusPainted(false);
         toggleSidebarButton.setBorderPainted(false);
         toggleSidebarButton.addActionListener(new ActionListener() {
@@ -65,24 +89,52 @@ public class MainGUI extends JFrame {
             }
         });
 
-        // Create a panel for the toggle button (to center it in the north region)
+        // Add a toggle button for light/dark mode
+        JButton toggleThemeButton = new JButton("🌙"); // Moon icon for dark mode
+        toggleThemeButton.setBackground(UIManager.getColor("Button.background")); // Theme-aware color
+        toggleThemeButton.setForeground(UIManager.getColor("Button.foreground")); // Theme-aware color
+        toggleThemeButton.setFocusPainted(false);
+        toggleThemeButton.setBorderPainted(false);
+        toggleThemeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                toggleTheme();
+            }
+        });
+
+        // Create a panel for the toggle buttons (to center them in the north region)
         JPanel togglePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        togglePanel.setBackground(new Color(18, 18, 18)); // Background: #121212
+        togglePanel.setBackground(UIManager.getColor("Panel.background")); // Theme-aware color
         togglePanel.add(toggleSidebarButton);
+        togglePanel.add(toggleThemeButton);
 
         // Add the toggle button panel to the north region of the main panel
         mainPanel.add(togglePanel, BorderLayout.NORTH);
 
+        // Add a logout button to the sidebar
+        JButton logoutButton = createSidebarButton("Logout", FontAwesome.SIGN_OUT);
+        logoutButton.addActionListener(e -> {
+            int choice = JOptionPane.showConfirmDialog(
+                    MainGUI.this,
+                    "Are you sure you want to logout?",
+                    "Logout",
+                    JOptionPane.YES_NO_OPTION
+            );
+            if (choice == JOptionPane.YES_OPTION) {
+                dispose(); // Close the MainGUI window
+                new LoginFrame().setVisible(true); // Open the login window
+            }
+        });
+        sidebar.add(Box.createVerticalStrut(20)); // Add spacing
+        sidebar.add(logoutButton);
+
         // Add the main panel to the frame
         add(mainPanel);
-
-        // Display the window
-        setVisible(true);
     }
 
     private JPanel createSidebar() {
         JPanel sidebar = new JPanel();
-        sidebar.setBackground(new Color(30, 30, 30)); // Sidebar background: #1E1E1E (slightly lighter than #121212)
+        sidebar.setBackground(UIManager.getColor("Panel.background")); // Theme-aware color
         sidebar.setPreferredSize(new Dimension(200, getHeight())); // Sidebar width: 200px
         sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
 
@@ -113,8 +165,8 @@ public class MainGUI extends JFrame {
     private JButton createSidebarButton(String text, FontAwesome icon) {
         JButton button = new JButton(text);
         button.setAlignmentX(Component.CENTER_ALIGNMENT);
-        button.setBackground(new Color(37, 37, 38)); // Button background: #252526
-        button.setForeground(Color.WHITE); // Text color: White
+        button.setBackground(UIManager.getColor("Button.background")); // Theme-aware color
+        button.setForeground(UIManager.getColor("Button.foreground")); // Theme-aware color
         button.setFocusPainted(false);
         button.setBorderPainted(false);
         button.setFont(new Font("Segoe UI", Font.PLAIN, 14));
@@ -122,7 +174,7 @@ public class MainGUI extends JFrame {
         button.setMaximumSize(new Dimension(180, 40));
 
         // Add icon to the button
-        FontIcon fontIcon = FontIcon.of(icon, 18, Color.WHITE);
+        FontIcon fontIcon = FontIcon.of(icon, 18, UIManager.getColor("Button.foreground")); // Theme-aware color
         button.setIcon(fontIcon);
         button.setHorizontalAlignment(SwingConstants.LEFT); // Align text and icon to the left
         button.setIconTextGap(10); // Add spacing between icon and text
@@ -130,11 +182,11 @@ public class MainGUI extends JFrame {
         // Add hover effect
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(new Color(58, 58, 58)); // Hover color: #3A3A3A
+                button.setBackground(UIManager.getColor("Button.hoverBackground")); // Theme-aware color
             }
 
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                button.setBackground(new Color(37, 37, 38)); // Default color: #252526
+                button.setBackground(UIManager.getColor("Button.background")); // Theme-aware color
             }
         });
 
@@ -155,8 +207,31 @@ public class MainGUI extends JFrame {
         repaint(); // Ensure the UI updates
     }
 
-    public static void main(String[] args) {
-        // Run the GUI on the Event Dispatch Thread
-        SwingUtilities.invokeLater(() -> new MainGUI());
+    private void toggleTheme() {
+        try {
+            if (isDarkMode) {
+                // Switch to light mode
+                FlatLightLaf.setup();
+                isDarkMode = false;
+                toggleThemeButton.setText("🌙"); // Moon icon for dark mode
+            } else {
+                // Switch to dark mode
+                FlatDarkLaf.setup();
+                isDarkMode = true;
+                toggleThemeButton.setText("☀️"); // Sun icon for light mode
+            }
+            // Update the UI for all panels
+            refreshAllPanels();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void refreshAllPanels() {
+        SwingUtilities.updateComponentTreeUI(this); // Refresh the main frame
+        clientPanel.refreshUI(); // Refresh ClientPanel
+        produitPanel.refreshUI(); // Refresh ProduitPanel
+        facturePanel.refreshUI(); // Refresh FacturePanel
+        commandePanel.refreshUI(); // Refresh CommandePanel
     }
 }
