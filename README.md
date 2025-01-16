@@ -55,6 +55,15 @@ String password = ""; // Leave empty if no password is set
    ```bash
    java -jar GestionCommandesFactures.jar
    ```
+4. **Add a User for Login:**
+        - To access the application, you need to add yourself as a user in the `users` table of the database.
+        - Use the provided class in the project to generate the hashed version of your password.
+        - Execute the following SQL command to add a user:
+          ```sql
+          INSERT INTO users (username, password) 
+          VALUES ('yourUsername', 'hashed_password_here');
+          ```
+
 
 ## Contributing
 Contributions are welcome! If you'd like to contribute, please follow these steps:
