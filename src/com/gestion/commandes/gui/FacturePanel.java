@@ -15,7 +15,6 @@ public class FacturePanel extends JPanel {
     private JTable factureTable;
     private DefaultTableModel tableModel;
     private FactureDAO factureDAO;
-    private JTextField discountField; // New field for discount input
 
     public FacturePanel() {
         initComponents();
@@ -64,16 +63,6 @@ public class FacturePanel extends JPanel {
         JButton editButton = createButton("Modifier", UIManager.getColor("Button.background")); // Theme-aware button color
         JButton deleteButton = createButton("Supprimer", UIManager.getColor("Button.background")); // Theme-aware button color
         JButton exportButton = createButton("Exporter en PDF", UIManager.getColor("Button.background")); // Theme-aware button color
-
-        // Add discount input field
-        discountField = new JTextField(10); // For entering discount percentage
-        discountField.setBackground(UIManager.getColor("TextField.background")); // Theme-aware background
-        discountField.setForeground(UIManager.getColor("TextField.foreground")); // Theme-aware text color
-        discountField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        discountField.setBorder(BorderFactory.createLineBorder(UIManager.getColor("TextField.borderColor"))); // Theme-aware border color
-
-        buttonPanel.add(new JLabel("Remise (%):"));
-        buttonPanel.add(discountField);
 
         // Add action listeners
         addButton.addActionListener(e -> {
@@ -176,9 +165,9 @@ public class FacturePanel extends JPanel {
                 tableModel.addRow(new Object[]{
                         facture.getIdFacture(),
                         facture.getDate(),
-                        facture.getMontantTotal(),
+                        facture.getMontantTotalAfterDiscount(), // Display the discounted total
                         facture.getIdClient(),
-                        facture.getDiscount() // Add discount to the table
+                        facture.getDiscount()
                 });
             }
         } catch (SQLException e) {
@@ -234,11 +223,6 @@ public class FacturePanel extends JPanel {
                 }
             }
         }
-
-        // Refresh the discount field
-        discountField.setBackground(UIManager.getColor("TextField.background")); // Theme-aware background
-        discountField.setForeground(UIManager.getColor("TextField.foreground")); // Theme-aware text color
-        discountField.setBorder(BorderFactory.createLineBorder(UIManager.getColor("TextField.borderColor"))); // Theme-aware border color
 
         revalidate();
         repaint();

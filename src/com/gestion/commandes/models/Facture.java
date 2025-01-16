@@ -69,4 +69,12 @@ public class Facture {
     public void setDiscount(double discount) {
         this.discount = discount;
     }
+
+    // Method to calculate the total amount after applying the discount
+    public double getMontantTotalAfterDiscount() {
+        if (discount > 0) {
+            return montantTotal * (1 - (discount / 100.0)); // Apply discount
+        }
+        return montantTotal; // Return original total if no discount
+    }
 }

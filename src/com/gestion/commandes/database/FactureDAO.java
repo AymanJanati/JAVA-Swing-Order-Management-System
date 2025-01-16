@@ -11,23 +11,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FactureDAO {
+
     // Method to add an invoice
     public void addFacture(Facture facture) throws SQLException {
-        String query = "INSERT INTO factures (date, montantTotal, idClient, discount) VALUES (?, ?, ?, ?)"; // Added discount
+        // Calculate the total amount after applying the discount
+        double montantTotalAfterDiscount = facture.getMontantTotalAfterDiscount();
+
+        String query = "INSERT INTO factures (date, montantTotal, idClient, discount) VALUES (?, ?, ?, ?)";
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, facture.getDate());
-            statement.setDouble(2, facture.getMontantTotal());
+            statement.setDouble(2, montantTotalAfterDiscount); // Use the discounted total
             statement.setInt(3, facture.getIdClient());
-            statement.setDouble(4, facture.getDiscount()); // Added discount
+            statement.setDouble(4, facture.getDiscount());
             statement.executeUpdate();
 
-            // Get the generated invoice ID
+            // Get the generated invoice ID and add invoice lines
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     int idFacture = generatedKeys.getInt(1);
-
-                    // Add invoice lines
                     for (LigneFacture ligne : facture.getLignesFacture()) {
                         addLigneFacture(idFacture, ligne);
                     }
@@ -61,11 +63,11 @@ public class FactureDAO {
                 String date = resultSet.getString("date");
                 double montantTotal = resultSet.getDouble("montantTotal");
                 int idClient = resultSet.getInt("idClient");
-                double discount = resultSet.getDouble("discount"); // Added discount
+                double discount = resultSet.getDouble("discount");
 
                 // Get invoice lines
                 List<LigneFacture> lignes = getLignesFacture(idFacture);
-                factures.add(new Facture(idFacture, date, montantTotal, idClient, lignes, discount)); // Added discount
+                factures.add(new Facture(idFacture, date, montantTotal, idClient, lignes, discount));
             }
         }
         return factures;
@@ -93,14 +95,17 @@ public class FactureDAO {
 
     // Method to update an invoice
     public void updateFacture(Facture facture) throws SQLException {
+        // Calculate the total amount after applying the discount
+        double montantTotalAfterDiscount = facture.getMontantTotalAfterDiscount();
+
         // Update the invoice
-        String query = "UPDATE factures SET date = ?, montantTotal = ?, idClient = ?, discount = ? WHERE idFacture = ?"; // Added discount
+        String query = "UPDATE factures SET date = ?, montantTotal = ?, idClient = ?, discount = ? WHERE idFacture = ?";
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, facture.getDate());
-            statement.setDouble(2, facture.getMontantTotal());
+            statement.setDouble(2, montantTotalAfterDiscount); // Use the discounted total
             statement.setInt(3, facture.getIdClient());
-            statement.setDouble(4, facture.getDiscount()); // Added discount
+            statement.setDouble(4, facture.getDiscount());
             statement.setInt(5, facture.getIdFacture());
             statement.executeUpdate();
         }
