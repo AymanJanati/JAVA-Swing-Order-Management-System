@@ -6,10 +6,11 @@
         <element id="module-output" name="GestionCommandesFactures" />
         <element id="dir-copy" path="$PROJECT_DIR$" />
       </element>
-      <element id="file-copy" path="$PROJECT_DIR$/lib/itextpdf-5.5.13.3.jar" />
+      <element id="file-copy" path="$PROJECT_DIR$/lib/mysql-connector-j-9.1.0.jar" />
       <element id="library" level="project" name="ikonli-core-12.3.1" />
       <element id="file-copy" path="$PROJECT_DIR$/lib/flatlaf-3.5.4.jar" />
-      <element id="file-copy" path="$PROJECT_DIR$/lib/mysql-connector-j-9.1.0.jar" />
+      <element id="file-copy" path="$PROJECT_DIR$/lib/itextpdf-5.5.13.3.jar" />
+      <element id="library" level="project" name="jbcrypt-0.4" />
     </root>
   </artifact>
 </component>

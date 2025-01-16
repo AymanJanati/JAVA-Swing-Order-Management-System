@@ -22,6 +22,7 @@ public class LoginFrame extends JFrame {
 
     public LoginFrame() {
         // Set the FlatLaf dark theme
+        MainGUI.loadCustomTheme("C:/GI2/s3/GL&POO JAVA/GestionCommandesFactures/src/main/resources/custom_dark.properties");
         FlatDarkLaf.setup();
 
         setTitle("AstraOrders - Login");

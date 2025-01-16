@@ -1,6 +1,6 @@
 package com.gestion.commandes.gui;
-import java.io.FileNotFoundException;
 
+import java.io.FileNotFoundException;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.FlatLaf;
@@ -41,7 +41,7 @@ public class MainGUI extends JFrame {
     }
 
     // Load custom theme properties
-    private static void loadCustomTheme(String absolutePath) {
+    public static void loadCustomTheme(String absolutePath) {
         System.out.println("Attempting to load theme file from: " + absolutePath);
 
         try (InputStream input = new FileInputStream(absolutePath)) {
@@ -86,7 +86,7 @@ public class MainGUI extends JFrame {
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(UIManager.getColor("Panel.background")); // Theme-aware color
 
-        // Create the sidebar with a slightly lighter color (#1E1E1E)
+        // Create the sidebar with a distinct color
         sidebar = createSidebar();
         mainPanel.add(sidebar, BorderLayout.WEST);
 
@@ -166,7 +166,7 @@ public class MainGUI extends JFrame {
 
     private JPanel createSidebar() {
         JPanel sidebar = new JPanel();
-        sidebar.setBackground(UIManager.getColor("Panel.background")); // Theme-aware color
+        sidebar.setBackground(UIManager.getColor("Sidebar.background")); // Theme-aware color
         sidebar.setPreferredSize(new Dimension(200, getHeight())); // Sidebar width: 200px
         sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
 
@@ -197,8 +197,8 @@ public class MainGUI extends JFrame {
     private JButton createSidebarButton(String text, FontAwesome icon) {
         JButton button = new JButton(text);
         button.setAlignmentX(Component.CENTER_ALIGNMENT);
-        button.setBackground(UIManager.getColor("Button.background")); // Theme-aware color
-        button.setForeground(UIManager.getColor("Button.foreground")); // Theme-aware color
+        button.setBackground(UIManager.getColor("SidebarButton.background")); // Theme-aware color
+        button.setForeground(UIManager.getColor("SidebarButton.foreground")); // Theme-aware color
         button.setFocusPainted(false);
         button.setBorderPainted(false);
         button.setFont(new Font("Segoe UI", Font.PLAIN, 14));
@@ -206,7 +206,7 @@ public class MainGUI extends JFrame {
         button.setMaximumSize(new Dimension(180, 40));
 
         // Add icon to the button
-        FontIcon fontIcon = FontIcon.of(icon, 18, UIManager.getColor("Button.foreground")); // Theme-aware color
+        FontIcon fontIcon = FontIcon.of(icon, 18, UIManager.getColor("SidebarButton.foreground")); // Theme-aware color
         button.setIcon(fontIcon);
         button.setHorizontalAlignment(SwingConstants.LEFT); // Align text and icon to the left
         button.setIconTextGap(10); // Add spacing between icon and text
@@ -214,11 +214,11 @@ public class MainGUI extends JFrame {
         // Add hover effect
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(UIManager.getColor("Button.hoverBackground")); // Theme-aware color
+                button.setBackground(UIManager.getColor("SidebarButton.hoverBackground")); // Theme-aware hover color
             }
 
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                button.setBackground(UIManager.getColor("Button.background")); // Theme-aware color
+                button.setBackground(UIManager.getColor("SidebarButton.background")); // Restore original color
             }
         });
 
@@ -263,7 +263,20 @@ public class MainGUI extends JFrame {
     }
 
     private void refreshAllPanels() {
-        SwingUtilities.updateComponentTreeUI(this); // Refresh the main frame
+        // Refresh the main frame
+        SwingUtilities.updateComponentTreeUI(this);
+
+        // Refresh the sidebar
+        sidebar.setBackground(UIManager.getColor("Sidebar.background"));
+        for (Component component : sidebar.getComponents()) {
+            if (component instanceof JButton) {
+                JButton button = (JButton) component;
+                button.setBackground(UIManager.getColor("SidebarButton.background"));
+                button.setForeground(UIManager.getColor("SidebarButton.foreground"));
+            }
+        }
+
+        // Refresh all panels
         clientPanel.refreshUI(); // Refresh ClientPanel
         produitPanel.refreshUI(); // Refresh ProduitPanel
         facturePanel.refreshUI(); // Refresh FacturePanel
