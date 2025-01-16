@@ -18,8 +18,12 @@ public class FacturePanel extends JPanel {
     private JTextField discountField; // New field for discount input
 
     public FacturePanel() {
+        initComponents();
+    }
+
+    private void initComponents() {
         setLayout(new BorderLayout());
-        setBackground(new Color(18, 18, 18)); // Updated to dark theme background: #121212
+        setBackground(UIManager.getColor("Panel.background")); // Theme-aware background
 
         // Initialize the DAO
         factureDAO = new FactureDAO();
@@ -37,12 +41,12 @@ public class FacturePanel extends JPanel {
         factureTable.setRowHeight(30); // Increase row height for better readability
         factureTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14)); // Set header font
 
-        // Style the table for dark theme
-        factureTable.setBackground(new Color(37, 37, 38)); // Table background: #252526
-        factureTable.setForeground(Color.WHITE); // Text color: White
-        factureTable.getTableHeader().setBackground(new Color(52, 21, 57)); // Header background: #341539
-        factureTable.getTableHeader().setForeground(Color.WHITE); // Header text color: White
-        factureTable.setGridColor(new Color(58, 58, 58)); // Grid color: #3A3A3A
+        // Style the table for the current theme
+        factureTable.setBackground(UIManager.getColor("Table.background")); // Theme-aware background
+        factureTable.setForeground(UIManager.getColor("Table.foreground")); // Theme-aware text color
+        factureTable.getTableHeader().setBackground(UIManager.getColor("TableHeader.background")); // Theme-aware header background
+        factureTable.getTableHeader().setForeground(UIManager.getColor("TableHeader.foreground")); // Theme-aware header text color
+        factureTable.setGridColor(UIManager.getColor("Table.gridColor")); // Theme-aware grid color
 
         JScrollPane scrollPane = new JScrollPane(factureTable);
         scrollPane.setBorder(BorderFactory.createEmptyBorder()); // Remove border
@@ -53,20 +57,20 @@ public class FacturePanel extends JPanel {
 
         // Create buttons for CRUD operations
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setBackground(new Color(18, 18, 18)); // Updated to dark theme background: #121212
+        buttonPanel.setBackground(UIManager.getColor("Panel.background")); // Theme-aware background
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0)); // Add padding
 
-        JButton addButton = createButton("Ajouter", new Color(52, 21, 57)); // Accent color: #341539
-        JButton editButton = createButton("Modifier", new Color(44, 62, 80)); // Secondary color: #2C3E50
-        JButton deleteButton = createButton("Supprimer", new Color(231, 76, 60)); // Highlight color: #E74C3C
-        JButton exportButton = createButton("Exporter en PDF", new Color(52, 152, 219)); // Export button color: #3498DB
+        JButton addButton = createButton("Ajouter", UIManager.getColor("Button.background")); // Theme-aware button color
+        JButton editButton = createButton("Modifier", UIManager.getColor("Button.background")); // Theme-aware button color
+        JButton deleteButton = createButton("Supprimer", UIManager.getColor("Button.background")); // Theme-aware button color
+        JButton exportButton = createButton("Exporter en PDF", UIManager.getColor("Button.background")); // Theme-aware button color
 
         // Add discount input field
         discountField = new JTextField(10); // For entering discount percentage
-        discountField.setBackground(new Color(37, 37, 38)); // Input field background: #252526
-        discountField.setForeground(Color.WHITE); // Input field text color: White
+        discountField.setBackground(UIManager.getColor("TextField.background")); // Theme-aware background
+        discountField.setForeground(UIManager.getColor("TextField.foreground")); // Theme-aware text color
         discountField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        discountField.setBorder(BorderFactory.createLineBorder(new Color(58, 58, 58))); // Border color: #3A3A3A
+        discountField.setBorder(BorderFactory.createLineBorder(UIManager.getColor("TextField.borderColor"))); // Theme-aware border color
 
         buttonPanel.add(new JLabel("Remise (%):"));
         buttonPanel.add(discountField);
@@ -144,7 +148,7 @@ public class FacturePanel extends JPanel {
     private JButton createButton(String text, Color color) {
         JButton button = new JButton(text);
         button.setBackground(color);
-        button.setForeground(Color.WHITE); // Text color: White
+        button.setForeground(UIManager.getColor("Button.foreground")); // Theme-aware text color
         button.setFont(new Font("Segoe UI", Font.BOLD, 14));
         button.setFocusPainted(false);
         button.setBorderPainted(false);
@@ -153,7 +157,7 @@ public class FacturePanel extends JPanel {
         // Add hover effect
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(color.brighter()); // Slightly lighter on hover
+                button.setBackground(UIManager.getColor("Button.hoverBackground")); // Theme-aware hover color
             }
 
             public void mouseExited(java.awt.event.MouseEvent evt) {
@@ -203,5 +207,40 @@ public class FacturePanel extends JPanel {
             PDFExporter.exportToPDF(filePath, content.toString());
             JOptionPane.showMessageDialog(this, "Exportation réussie!", "Succès", JOptionPane.INFORMATION_MESSAGE);
         }
+    }
+
+    public void refreshUI() {
+        // Refresh the panel's appearance
+        setBackground(UIManager.getColor("Panel.background")); // Theme-aware background
+
+        // Refresh the table's appearance
+        factureTable.setBackground(UIManager.getColor("Table.background")); // Theme-aware background
+        factureTable.setForeground(UIManager.getColor("Table.foreground")); // Theme-aware text color
+        factureTable.getTableHeader().setBackground(UIManager.getColor("TableHeader.background")); // Theme-aware header background
+        factureTable.getTableHeader().setForeground(UIManager.getColor("TableHeader.foreground")); // Theme-aware header text color
+        factureTable.setGridColor(UIManager.getColor("Table.gridColor")); // Theme-aware grid color
+
+        // Refresh buttons
+        for (Component component : getComponents()) {
+            if (component instanceof JPanel) {
+                JPanel panel = (JPanel) component;
+                panel.setBackground(UIManager.getColor("Panel.background")); // Theme-aware background
+                for (Component button : panel.getComponents()) {
+                    if (button instanceof JButton) {
+                        JButton btn = (JButton) button;
+                        btn.setBackground(UIManager.getColor("Button.background")); // Theme-aware button color
+                        btn.setForeground(UIManager.getColor("Button.foreground")); // Theme-aware text color
+                    }
+                }
+            }
+        }
+
+        // Refresh the discount field
+        discountField.setBackground(UIManager.getColor("TextField.background")); // Theme-aware background
+        discountField.setForeground(UIManager.getColor("TextField.foreground")); // Theme-aware text color
+        discountField.setBorder(BorderFactory.createLineBorder(UIManager.getColor("TextField.borderColor"))); // Theme-aware border color
+
+        revalidate();
+        repaint();
     }
 }

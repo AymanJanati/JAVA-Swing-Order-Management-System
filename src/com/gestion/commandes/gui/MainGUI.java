@@ -1,14 +1,21 @@
 package com.gestion.commandes.gui;
+import java.io.FileNotFoundException;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.FlatLaf;
 import org.kordamp.ikonli.fontawesome.FontAwesome;
 import org.kordamp.ikonli.swing.FontIcon;
+import java.io.FileInputStream;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 public class MainGUI extends JFrame {
     private JPanel contentPanel; // Make contentPanel a class variable
@@ -33,8 +40,32 @@ public class MainGUI extends JFrame {
         SwingUtilities.invokeLater(() -> new MainGUI().setVisible(true));
     }
 
+    // Load custom theme properties
+    private static void loadCustomTheme(String absolutePath) {
+        System.out.println("Attempting to load theme file from: " + absolutePath);
+
+        try (InputStream input = new FileInputStream(absolutePath)) {
+            Properties properties = new Properties();
+            properties.load(input);
+
+            // Convert Properties to Map<String, String>
+            Map<String, String> themeMap = new HashMap<>();
+            for (String key : properties.stringPropertyNames()) {
+                themeMap.put(key, properties.getProperty(key));
+            }
+
+            // Set the custom theme properties
+            FlatLaf.setGlobalExtraDefaults(themeMap);
+            System.out.println("Successfully loaded theme from: " + absolutePath);
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Failed to load theme from: " + absolutePath, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
     private void initializeUI() {
-        // Set the FlatLaf dark theme by default
+        // Load the custom dark theme by default
+        loadCustomTheme("C:/GI2/s3/GL&POO JAVA/GestionCommandesFactures/src/main/resources/custom_dark.properties");
         FlatDarkLaf.setup();
 
         setTitle("AstraOrders - Gestion des Commandes et des Factures"); // Updated title
@@ -212,11 +243,13 @@ public class MainGUI extends JFrame {
         try {
             if (isDarkMode) {
                 // Switch to light mode
+                loadCustomTheme("C:/GI2/s3/GL&POO JAVA/GestionCommandesFactures/src/main/resources/custom_light.properties");
                 FlatLightLaf.setup();
                 isDarkMode = false;
                 toggleThemeButton.setText("🌙"); // Moon icon for dark mode
             } else {
                 // Switch to dark mode
+                loadCustomTheme("C:/GI2/s3/GL&POO JAVA/GestionCommandesFactures/src/main/resources/custom_dark.properties");
                 FlatDarkLaf.setup();
                 isDarkMode = true;
                 toggleThemeButton.setText("☀️"); // Sun icon for light mode
@@ -225,6 +258,7 @@ public class MainGUI extends JFrame {
             refreshAllPanels();
         } catch (Exception e) {
             e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to toggle theme.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
