@@ -15,6 +15,7 @@ public class MainGUI extends JFrame {
     private JPanel sidebar; // Make sidebar a class variable
     private boolean isSidebarVisible = true; // Track sidebar visibility
     private boolean isDarkMode = true; // Track dark mode state
+    private JButton toggleThemeButton; // Declare toggleThemeButton as a class variable
 
     // Panels
     private ClientPanel clientPanel;
@@ -89,8 +90,8 @@ public class MainGUI extends JFrame {
             }
         });
 
-        // Add a toggle button for light/dark mode
-        JButton toggleThemeButton = new JButton("🌙"); // Moon icon for dark mode
+        // Initialize the toggle button for light/dark mode
+        toggleThemeButton = new JButton("🌙"); // Moon icon for dark mode
         toggleThemeButton.setBackground(UIManager.getColor("Button.background")); // Theme-aware color
         toggleThemeButton.setForeground(UIManager.getColor("Button.foreground")); // Theme-aware color
         toggleThemeButton.setFocusPainted(false);

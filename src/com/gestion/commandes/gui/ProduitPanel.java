@@ -15,8 +15,12 @@ public class ProduitPanel extends JPanel {
     private ProduitDAO produitDAO;
 
     public ProduitPanel() {
+        initComponents();
+    }
+
+    private void initComponents() {
         setLayout(new BorderLayout());
-        setBackground(new Color(18, 18, 18)); // Updated to dark theme background: #121212
+        setBackground(UIManager.getColor("Panel.background")); // Theme-aware background
 
         // Initialize the DAO
         produitDAO = new ProduitDAO();
@@ -34,12 +38,12 @@ public class ProduitPanel extends JPanel {
         produitTable.setRowHeight(30); // Increase row height for better readability
         produitTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14)); // Set header font
 
-        // Style the table for dark theme
-        produitTable.setBackground(new Color(37, 37, 38)); // Table background: #252526
-        produitTable.setForeground(Color.WHITE); // Text color: White
-        produitTable.getTableHeader().setBackground(new Color(52, 21, 57)); // Header background: #341539
-        produitTable.getTableHeader().setForeground(Color.WHITE); // Header text color: White
-        produitTable.setGridColor(new Color(58, 58, 58)); // Grid color: #3A3A3A
+        // Style the table for the current theme
+        produitTable.setBackground(UIManager.getColor("Table.background")); // Theme-aware background
+        produitTable.setForeground(UIManager.getColor("Table.foreground")); // Theme-aware text color
+        produitTable.getTableHeader().setBackground(UIManager.getColor("TableHeader.background")); // Theme-aware header background
+        produitTable.getTableHeader().setForeground(UIManager.getColor("TableHeader.foreground")); // Theme-aware header text color
+        produitTable.setGridColor(UIManager.getColor("Table.gridColor")); // Theme-aware grid color
 
         JScrollPane scrollPane = new JScrollPane(produitTable);
         scrollPane.setBorder(BorderFactory.createEmptyBorder()); // Remove border
@@ -50,12 +54,12 @@ public class ProduitPanel extends JPanel {
 
         // Create buttons for CRUD operations
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setBackground(new Color(18, 18, 18)); // Updated to dark theme background: #121212
+        buttonPanel.setBackground(UIManager.getColor("Panel.background")); // Theme-aware background
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0)); // Add padding
 
-        JButton addButton = createButton("Ajouter", new Color(52, 21, 57)); // Accent color: #341539
-        JButton editButton = createButton("Modifier", new Color(44, 62, 80)); // Secondary color: #2C3E50
-        JButton deleteButton = createButton("Supprimer", new Color(231, 76, 60)); // Highlight color: #E74C3C
+        JButton addButton = createButton("Ajouter", UIManager.getColor("Button.background")); // Theme-aware button color
+        JButton editButton = createButton("Modifier", UIManager.getColor("Button.background")); // Theme-aware button color
+        JButton deleteButton = createButton("Supprimer", UIManager.getColor("Button.background")); // Theme-aware button color
 
         // Add action listeners
         addButton.addActionListener(e -> {
@@ -119,7 +123,7 @@ public class ProduitPanel extends JPanel {
     private JButton createButton(String text, Color color) {
         JButton button = new JButton(text);
         button.setBackground(color);
-        button.setForeground(Color.WHITE); // Text color: White
+        button.setForeground(UIManager.getColor("Button.foreground")); // Theme-aware text color
         button.setFont(new Font("Segoe UI", Font.BOLD, 14));
         button.setFocusPainted(false);
         button.setBorderPainted(false);
@@ -128,7 +132,7 @@ public class ProduitPanel extends JPanel {
         // Add hover effect
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(color.brighter()); // Slightly lighter on hover
+                button.setBackground(UIManager.getColor("Button.hoverBackground")); // Theme-aware hover color
             }
 
             public void mouseExited(java.awt.event.MouseEvent evt) {
@@ -155,5 +159,35 @@ public class ProduitPanel extends JPanel {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Erreur lors du chargement des produits.", "Erreur", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    public void refreshUI() {
+        // Refresh the panel's appearance
+        setBackground(UIManager.getColor("Panel.background")); // Theme-aware background
+
+        // Refresh the table's appearance
+        produitTable.setBackground(UIManager.getColor("Table.background")); // Theme-aware background
+        produitTable.setForeground(UIManager.getColor("Table.foreground")); // Theme-aware text color
+        produitTable.getTableHeader().setBackground(UIManager.getColor("TableHeader.background")); // Theme-aware header background
+        produitTable.getTableHeader().setForeground(UIManager.getColor("TableHeader.foreground")); // Theme-aware header text color
+        produitTable.setGridColor(UIManager.getColor("Table.gridColor")); // Theme-aware grid color
+
+        // Refresh buttons
+        for (Component component : getComponents()) {
+            if (component instanceof JPanel) {
+                JPanel panel = (JPanel) component;
+                panel.setBackground(UIManager.getColor("Panel.background")); // Theme-aware background
+                for (Component button : panel.getComponents()) {
+                    if (button instanceof JButton) {
+                        JButton btn = (JButton) button;
+                        btn.setBackground(UIManager.getColor("Button.background")); // Theme-aware button color
+                        btn.setForeground(UIManager.getColor("Button.foreground")); // Theme-aware text color
+                    }
+                }
+            }
+        }
+
+        revalidate();
+        repaint();
     }
 }
